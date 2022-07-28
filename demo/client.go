@@ -8,7 +8,7 @@ import (
 )
 
 const (
-    Req = `{"id": %d, "title": "task ID: %d", "completed": %s}`
+    Req = `{"id": %d, "todoItem": "task ID: %d", "complete": %s}`
     ServerAddress = "http://localhost:8080%s"
 
     MethodGet     = "GET"
@@ -29,9 +29,10 @@ func main() {
     fmt.Println("*********Add new tasks*********")
     for i := 1; i <= 10; i++ {
         body := fmt.Sprintf(Req, i, i, "false")
-        serverAddress := fmt.Sprintf(ServerAddress, "/todolist")
-        req := buildRequest("POST", serverAddress, []byte(body))
-        client.Do(req)
+        fmt.Println(body)
+        req := buildRequest(MethodPost, "/todolist", []byte(body))
+        res, _ := client.Do(req)
+        printResponse(res)
     }
 
     // Get all tasks
