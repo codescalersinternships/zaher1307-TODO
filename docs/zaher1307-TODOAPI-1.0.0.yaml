@@ -24,6 +24,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/todoItem'
+        "500":
+          description: Error due to any server failure
     post:
       tags:
       - todoList
@@ -40,6 +42,26 @@ paths:
           description: Invalid input, object is invalid
         "409":
           description: Anexisting item, already exists
+        "500":
+          description: Error due to any server failure
+    patch:
+      tags:
+      - todoList
+      summary: Update an existing todo
+      operationId: UpadateTodoItemById
+      responses:
+        "201":
+          description: Request successeded and item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+        "400":
+          description: Did not understand the request
+        "404":
+          description: Not found
+        "500":
+          description: Error due to any server failure
   /todolist/{id}:
     get:
       tags:
@@ -64,8 +86,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/todoItem'
+        "400":
+          description: The specified task ID is invalid.
         "404":
           description: Not found
+        "500":
+          description: Error due to any server failure
     delete:
       tags:
       - todoItem
@@ -82,34 +108,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Request recieved and is being processed
+        "202":
+          description: Request is accepted and is being processed
         "400":
           description: Did not understand the request
         "404":
           description: Not found
-    patch:
-      tags:
-      - todoItem
-      summary: Update an existing todo
-      operationId: UpadateTodoItemById
-      parameters:
-      - name: id
-        in: path
-        description: Id of todo item
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "201":
-          description: Request recieved and is being processed
-        "400":
-          description: Did not understand the request
-        "404":
-          description: Not found
+        "500":
+          description: Error due to any server failure
 components:
   schemas:
     todoItem:
@@ -120,6 +126,7 @@ components:
       type: object
       properties:
         id:
+          minimum: 1
           type: integer
           format: int64
           example: 123456789
