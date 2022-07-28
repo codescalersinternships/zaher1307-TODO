@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	DB_FILE = "DBFILE.db"
-	LISTEN_PORT    = ":8080"
+	DB_FILE         = "DBFILE.db"
+	LISTEN_PORT     = ":8080"
+	ErrAlreadyExist = "item already exist"
 )
 
 type Server struct {
@@ -21,7 +22,7 @@ type Server struct {
 }
 
 type Todo struct {
-    ID       uint64  `json:"id"`
+    ID       uint64 `json:"id"`
     TodoItem string `json:"todoItem"`
     Complete bool   `json:"complete"`
 }
@@ -84,7 +85,7 @@ func (db *Server) AddTodoItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := db.db.First(&todo, todo.ID); result.Error == nil {
-		http.Error(w, result.Error.Error(), http.StatusConflict)
+		http.Error(w, ErrAlreadyExist, http.StatusConflict)
 		return
 	}
 
