@@ -25,9 +25,12 @@
 			"response": []
 		},
 		{
-			"name": "post a todo item",
+			"name": "get a todo item",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -39,13 +42,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/todolist",
+					"raw": "localhost:8080/todolist/2",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"todolist"
+						"todolist",
+						"2"
 					]
 				}
 			},
