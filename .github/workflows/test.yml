@@ -10,7 +10,7 @@ jobs:
   code_testing:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     - name: install golang
       uses: actions/setup-go@v3
       with:
@@ -20,7 +20,7 @@ jobs:
       run: |
         cd todo-backend
         go test *.go
-
+    
     - name: build and run docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
