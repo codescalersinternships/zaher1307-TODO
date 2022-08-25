@@ -24,16 +24,16 @@ type Server struct {
 }
 
 type Todo struct {
-    ID       uint64 `json:"id"`
-    TodoItem string `json:"todoItem"`
-    Completed bool   `json:"completed"`
+	ID        uint64 `json:"id"`
+	TodoItem  string `json:"todoItem"`
+	Completed bool   `json:"completed"`
 }
 
 func (db *Server) GetTodoItemsList(w http.ResponseWriter, r *http.Request) {
 
-    var todoList []Todo
-	
-	if result := db.db.Find(&todoList) ;result.Error != nil {
+	var todoList []Todo
+
+	if result := db.db.Find(&todoList); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -55,7 +55,7 @@ func (db *Server) GetTodoItem(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	vars := mux.Vars(r)
 	id := vars["id"]
-	
+
 	if result := db.db.First(&todo, id); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusNotFound)
 		return
@@ -78,19 +78,19 @@ func (db *Server) AddTodoItem(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	if err := validateTaskFields(&todo); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	todo.ID = uint64(time.Now().UnixMilli())
 
 	if result := db.db.Create(&todo); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	data, err := json.Marshal(todo)
@@ -111,7 +111,7 @@ func (db *Server) UpdateTodoItem(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&newTodo); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	var oldTodo Todo
@@ -122,7 +122,7 @@ func (db *Server) UpdateTodoItem(w http.ResponseWriter, r *http.Request) {
 
 	if result := db.db.Save(&newTodo); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	data, err := json.Marshal(newTodo)
@@ -150,7 +150,7 @@ func (db *Server) DeleteTodoItem(w http.ResponseWriter, r *http.Request) {
 
 	if result := db.db.Delete(&todo); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
@@ -159,21 +159,21 @@ func (db *Server) DeleteTodoItem(w http.ResponseWriter, r *http.Request) {
 
 func validateTaskFields(t *Todo) error {
 
-    if len(t.TodoItem) == 0 {
-        return errors.New(fmt.Sprintln(http.StatusBadRequest))
-    }
-    return nil
+	if len(t.TodoItem) == 0 {
+		return errors.New(fmt.Sprintln(http.StatusBadRequest))
+	}
+	return nil
 
 }
 
-func main () {
+func main() {
 
 	s := Server{}
 	var err error
-	
+
 	if s.db, err = gorm.Open(sqlite.Open(DB_FILE), &gorm.Config{}); err != nil {
 		fmt.Println("Error")
-		return 
+		return
 	}
 	s.db.AutoMigrate(&Todo{})
 
@@ -181,7 +181,7 @@ func main () {
 
 	c := cors.AllowAll()
 	server := &http.Server{
-		Addr: LISTEN_PORT,
+		Addr:    LISTEN_PORT,
 		Handler: c.Handler(router),
 	}
 
@@ -195,9 +195,3 @@ func main () {
 	server.ListenAndServe()
 
 }
-
-
-
-
-
-
