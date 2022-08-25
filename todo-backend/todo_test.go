@@ -20,9 +20,9 @@ func initDatabase(str string) {
 
 	var err error
 
-	if s.db, err = gorm.Open(sqlite.Open(str + DB_FILE), &gorm.Config{}); err != nil {
+	if s.db, err = gorm.Open(sqlite.Open(str+DB_FILE), &gorm.Config{}); err != nil {
 		fmt.Println("Error")
-		return 
+		return
 	}
 	s.db.AutoMigrate(&Todo{})
 
@@ -43,7 +43,7 @@ func TestGetTodoItemsList(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		want := []Todo{}
-		s.db.Find(&want)	
+		s.db.Find(&want)
 
 		s.GetTodoItemsList(response, request)
 
@@ -69,7 +69,7 @@ func TestGetTodoItem(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		want := Todo{ID: 1, TodoItem: "study", Completed: false}
-		s.db.Create(&want)	
+		s.db.Create(&want)
 
 		s.GetTodoItem(response, request)
 
@@ -86,33 +86,6 @@ func TestGetTodoItem(t *testing.T) {
 
 func TestAddTodoItem(t *testing.T) {
 
-	t.Run("try to add a specific todo item", func(t *testing.T) {
-
-		initDatabase("3")
-		defer removeDatabase("3")
-
-		postRequestBody := strings.NewReader(`{"id":1, "todoItem":"study", "complete":false}`)
-		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
-		postResponse := httptest.NewRecorder()
-
-		getRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", nil)
-		getResponse := httptest.NewRecorder()
-
-
-		want := Todo{ID: 1, TodoItem: "study", Completed: false}
-
-		s.AddTodoItem(postResponse, postRequest)
-		s.GetTodoItem(getResponse, getRequest)
-
-		var got Todo
-		json.NewDecoder(getResponse.Body).Decode(&got)
-
-		if !reflect.DeepEqual(want, got) {
-			t.Errorf("\ngot:\n%v\nwant:\n%v\n", got, want)
-		}
-
-	})
-
 	t.Run("try to get a bad request", func(t *testing.T) {
 
 		initDatabase("3")
@@ -121,8 +94,6 @@ func TestAddTodoItem(t *testing.T) {
 		postRequestBody := strings.NewReader(`"ihjkldshl,asdfklskl[sdasdafjssdji()]"false}`)
 		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
 		postResponse := httptest.NewRecorder()
-
-
 
 		s.AddTodoItem(postResponse, postRequest)
 		got := postResponse.Result().Status
@@ -143,33 +114,9 @@ func TestAddTodoItem(t *testing.T) {
 		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
 		postResponse := httptest.NewRecorder()
 
-
-
 		s.AddTodoItem(postResponse, postRequest)
 		got := postResponse.Result().Status
 		want := "400 Bad Request"
-
-		if !reflect.DeepEqual(want, got) {
-			t.Errorf("\ngot:\n%v\nwant:\n%v\n", got, want)
-		}
-
-	})
-
-	t.Run("try to add existing element", func(t *testing.T) {
-
-		initDatabase("3")
-		defer removeDatabase("3")
-
-		postRequestBody := strings.NewReader(`{"id":1, "todoItem":"study", "complete":false}`)
-		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
-		postResponse := httptest.NewRecorder()
-
-		item := Todo{ID:1, TodoItem:"study", Completed:false}
-		s.db.Create(&item)
-
-		s.AddTodoItem(postResponse, postRequest)
-		got := postResponse.Result().Status
-		want := "409 Conflict"
 
 		if !reflect.DeepEqual(want, got) {
 			t.Errorf("\ngot:\n%v\nwant:\n%v\n", got, want)
@@ -181,37 +128,6 @@ func TestAddTodoItem(t *testing.T) {
 
 func TestUpdataTodoItem(t *testing.T) {
 
-	t.Run("try to modify a specific todo item", func(t *testing.T) {
-
-		initDatabase("4")
-		defer removeDatabase("4")
-
-		postRequestBody := strings.NewReader(`{"id":1, "todoItem":"study", "complete":false}`)
-		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
-		postResponse := httptest.NewRecorder()
-
-		patchRequestBody := strings.NewReader(`{"id":1, "todoItem":"modified-study", "complete":false}`)
-		patchRequest := httptest.NewRequest(http.MethodPatch, "localhost:8080/todolist/1", patchRequestBody)
-		patchResponse := httptest.NewRecorder()
-
-		getRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", nil)
-		getResponse := httptest.NewRecorder()
-
-
-		want := Todo{ID: 1, TodoItem: "modified-study", Completed: false}
-		s.AddTodoItem(postResponse, postRequest)
-		s.UpdateTodoItem(patchResponse, patchRequest)
-		s.GetTodoItem(getResponse, getRequest)
-
-		var got Todo
-		json.NewDecoder(getResponse.Body).Decode(&got)
-
-		if !reflect.DeepEqual(want, got) {
-			t.Errorf("\ngot:\n%v\nwant:\n%v\n", got, want)
-		}
-
-	})
-
 	t.Run("try to get a bad request in modification", func(t *testing.T) {
 
 		initDatabase("3")
@@ -220,8 +136,6 @@ func TestUpdataTodoItem(t *testing.T) {
 		patchRequestBody := strings.NewReader(`"ihjkldshl,asdfklskl[sdasdafjssdji()]"false}`)
 		patchRequest := httptest.NewRequest(http.MethodPatch, "localhost:8080/todolist", patchRequestBody)
 		patchResponse := httptest.NewRecorder()
-
-
 
 		s.UpdateTodoItem(patchResponse, patchRequest)
 		got := patchResponse.Result().Status
@@ -241,8 +155,6 @@ func TestUpdataTodoItem(t *testing.T) {
 		patchRequestBody := strings.NewReader(`{"invalid":"invalid", "invalid":"study", "complete":false}`)
 		patchRequest := httptest.NewRequest(http.MethodPatch, "localhost:8080/todolist", patchRequestBody)
 		patchResponse := httptest.NewRecorder()
-
-
 
 		s.UpdateTodoItem(patchResponse, patchRequest)
 		got := patchResponse.Result().Status
@@ -274,7 +186,6 @@ func TestDeleteTodoItem(t *testing.T) {
 		getRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", nil)
 		getResponse := httptest.NewRecorder()
 
-
 		want := []Todo{}
 
 		s.AddTodoItem(postResponse, postRequest)
@@ -299,8 +210,6 @@ func TestDeleteTodoItem(t *testing.T) {
 		deleteRequest := httptest.NewRequest(http.MethodPatch, "localhost:8080/todolist", deleteRequestBody)
 		deleteResponse := httptest.NewRecorder()
 
-
-
 		s.DeleteTodoItem(deleteResponse, deleteRequest)
 		got := deleteResponse.Result().Status
 		want := "400 Bad Request"
@@ -311,10 +220,4 @@ func TestDeleteTodoItem(t *testing.T) {
 
 	})
 
-
 }
-
-
-
-
-
