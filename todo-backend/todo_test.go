@@ -68,7 +68,7 @@ func TestGetTodoItem(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "localhost:8080/todolist/1", nil)
 		response := httptest.NewRecorder()
 
-		want := Todo{ID: 1, TodoItem: "study", Complete: false}
+		want := Todo{ID: 1, TodoItem: "study", Completed: false}
 		s.db.Create(&want)	
 
 		s.GetTodoItem(response, request)
@@ -99,7 +99,7 @@ func TestAddTodoItem(t *testing.T) {
 		getResponse := httptest.NewRecorder()
 
 
-		want := Todo{ID: 1, TodoItem: "study", Complete: false}
+		want := Todo{ID: 1, TodoItem: "study", Completed: false}
 
 		s.AddTodoItem(postResponse, postRequest)
 		s.GetTodoItem(getResponse, getRequest)
@@ -164,7 +164,7 @@ func TestAddTodoItem(t *testing.T) {
 		postRequest := httptest.NewRequest(http.MethodPost, "localhost:8080/todolist", postRequestBody)
 		postResponse := httptest.NewRecorder()
 
-		item := Todo{ID:1, TodoItem:"study", Complete:false}
+		item := Todo{ID:1, TodoItem:"study", Completed:false}
 		s.db.Create(&item)
 
 		s.AddTodoItem(postResponse, postRequest)
@@ -198,7 +198,7 @@ func TestUpdataTodoItem(t *testing.T) {
 		getResponse := httptest.NewRecorder()
 
 
-		want := Todo{ID: 1, TodoItem: "modified-study", Complete: false}
+		want := Todo{ID: 1, TodoItem: "modified-study", Completed: false}
 		s.AddTodoItem(postResponse, postRequest)
 		s.UpdateTodoItem(patchResponse, patchRequest)
 		s.GetTodoItem(getResponse, getRequest)

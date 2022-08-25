@@ -5,15 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 const (
 	DB_FILE         = "DBFILE.db"
-	LISTEN_PORT     = ":8080"
+	LISTEN_PORT     = ":8010"
 	ErrAlreadyExist = "item already exist"
 )
 
@@ -24,7 +26,7 @@ type Server struct {
 type Todo struct {
     ID       uint64 `json:"id"`
     TodoItem string `json:"todoItem"`
-    Complete bool   `json:"complete"`
+    Completed bool   `json:"completed"`
 }
 
 func (db *Server) GetTodoItemsList(w http.ResponseWriter, r *http.Request) {
@@ -84,10 +86,7 @@ func (db *Server) AddTodoItem(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-	if result := db.db.First(&todo, todo.ID); result.Error == nil {
-		http.Error(w, ErrAlreadyExist, http.StatusConflict)
-		return
-	}
+	todo.ID = uint64(time.Now().UnixMilli())
 
 	if result := db.db.Create(&todo); result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -160,7 +159,7 @@ func (db *Server) DeleteTodoItem(w http.ResponseWriter, r *http.Request) {
 
 func validateTaskFields(t *Todo) error {
 
-    if t.ID == 0 || len(t.TodoItem) == 0 {
+    if len(t.TodoItem) == 0 {
         return errors.New(fmt.Sprintln(http.StatusBadRequest))
     }
     return nil
@@ -179,13 +178,21 @@ func main () {
 	s.db.AutoMigrate(&Todo{})
 
 	router := mux.NewRouter()
+
+	c := cors.AllowAll()
+	server := &http.Server{
+		Addr: LISTEN_PORT,
+		Handler: c.Handler(router),
+	}
+
+	router.Use()
 	router.HandleFunc("/todolist", s.GetTodoItemsList).Methods("GET")
 	router.HandleFunc("/todolist", s.AddTodoItem).Methods("POST")
 	router.HandleFunc("/todolist", s.UpdateTodoItem).Methods("PATCH")
 	router.HandleFunc("/todolist/{id}", s.GetTodoItem).Methods("GET")
 	router.HandleFunc("/todolist/{id}", s.DeleteTodoItem).Methods("DELETE")
 
-	http.ListenAndServe(LISTEN_PORT, router)
+	server.ListenAndServe()
 
 }
 
