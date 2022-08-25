@@ -1,4 +1,4 @@
-name: Todo tests
+name: Todo backend tests
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
         go-version: 1.18
 
     - name: go test
-      run: go test *.go
+      run: go test todo-backend/todo_test.go
     
     - name: build and run docker image
       uses: mr-smithers-excellent/docker-build-push@v5
