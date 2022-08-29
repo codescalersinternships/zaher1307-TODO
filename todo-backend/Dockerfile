@@ -1,6 +1,6 @@
 FROM golang AS builder
 
-WORKDIR /build
+WORKDIR /app/backend
 
 COPY . .
 
@@ -11,8 +11,8 @@ FROM ubuntu
 
 WORKDIR /todo-app
 
-COPY --from=builder /build/todo .
+COPY --from=builder /app/backend/todo .
 
-EXPOSE 8080
+EXPOSE 8010
 
 CMD [ "./todo" ]
