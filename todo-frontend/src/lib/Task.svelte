@@ -20,11 +20,11 @@ async function handleDone(){
 </script>
 
 <div class="task">
-  <button name={task.title + "-toggle"} class='btn {task.completed? "btn-done":""}' on:click={handleDone} ></button>
+  <button data-name={task.todoItem + "-toggle"} class='btn {task.completed? "btn-done":""}' on:click={handleDone} ></button>
   <div class="p--contianer">
   <p class={ task.completed? "text-done" :"" }>{task.todoItem}</p>
   </div>
-  <button name={task.title + "-delete"} on:click={handleDelete(task.id)}>Delete</button>
+  <button data-name={task.todoItem + "-delete"} on:click={handleDelete(task.id)}>Delete</button>
   </div>
 
 <style>
